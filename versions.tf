@@ -1,7 +1,7 @@
 # Service Bus Module Versions
 
 terraform {
-  required_version = "~> 4.0"
+  required_version = ">= 1.5.0"
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"

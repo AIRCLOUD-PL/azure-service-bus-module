@@ -174,18 +174,13 @@ resource "azurerm_servicebus_namespace" "this" {
       public_network_access_enabled = network_rule_set.value.public_network_access_enabled
       trusted_services_allowed      = network_rule_set.value.trusted_services_allowed
 
-      dynamic "ip_rules" {
-        for_each = network_rule_set.value.ip_rules
-        content {
-          ip_mask = ip_rules.value
-        }
-      }
+      ip_rules = network_rule_set.value.ip_rules
 
-      dynamic "virtual_network_rules" {
+      dynamic "network_rules" {
         for_each = network_rule_set.value.virtual_network_rules
         content {
-          subnet_id                            = virtual_network_rules.value.subnet_id
-          ignore_missing_vnet_service_endpoint = virtual_network_rules.value.ignore_missing_vnet_service_endpoint
+          subnet_id                            = network_rules.value.subnet_id
+          ignore_missing_vnet_service_endpoint = network_rules.value.ignore_missing_vnet_service_endpoint
         }
       }
     }
@@ -322,12 +317,7 @@ resource "azurerm_servicebus_subscription_rule" "this" {
   subscription_id = azurerm_servicebus_subscription.this["${each.value.topic_name}.${each.value.subscription_name}"].id
   filter_type     = each.value.filter_type
 
-  dynamic "sql_filter" {
-    for_each = each.value.sql_filter != null ? [each.value.sql_filter] : []
-    content {
-      sql_expression = sql_filter.value
-    }
-  }
+  sql_filter = each.value.sql_filter
 
   dynamic "correlation_filter" {
     for_each = each.value.correlation_filter != null ? [each.value.correlation_filter] : []
@@ -343,12 +333,7 @@ resource "azurerm_servicebus_subscription_rule" "this" {
     }
   }
 
-  dynamic "action" {
-    for_each = each.value.action != null ? [each.value.action] : []
-    content {
-      sql_expression = action.value
-    }
-  }
+  action = each.value.action
 }
 
 # Private Endpoints
